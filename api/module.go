@@ -318,12 +318,51 @@ func StopInstance(c *gin.Context) {
 
 	// TODO：实际的模块实例也不能访问了
 	// TODO: 在对应进销存服务的域名表中加一个valid字段，表示当前域名是否有效，这里停用之后要到那边修改
+	ChangeDomainStatus("http://127.0.0.1:3000/changedomainstatus", updSrv.InstanceID, false)
 
 	c.JSON(http.StatusOK, serializer.Response{
 		Code: 200,
 		Msg:  "Stop module instance",
 	})
 }
+
+type DomainStatus struct {
+	ComID int64 `json:"com_id"`
+	Status bool `json:"status"`
+}
+
+func ChangeDomainStatus(url string, instance_id int64, status bool) {
+	var d DomainStatus
+	d.ComID = instance_id
+	d.Status = status
+	b, err := json.Marshal(d)
+	if err != nil {
+		fmt.Println("fail to convert struct to json: ", err)
+		return
+	}
+	//fmt.Println(string(b))
+	buffer := bytes.NewBuffer(b)
+
+	request, err := http.NewRequest("POST", url, buffer)
+	if err != nil {
+		fmt.Printf("http.NewRequest%v", err)
+		return
+	}
+	request.Header.Set("Content-Type", "application/json;charset=UTF-8")  //添加请求头
+	client := http.Client{} //创建客户端
+	resp, err := client.Do(request.WithContext(context.TODO())) //发送请求
+	if err != nil {
+		fmt.Printf("client.Do %v", err)
+		return
+	}
+	respBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Printf("ioutil.ReadAll %v", err)
+		return
+	}
+	fmt.Println(string(respBytes))
+}
+
 
 func StartInstance(c *gin.Context) {
 	var updSrv InstanceService
@@ -342,6 +381,8 @@ func StartInstance(c *gin.Context) {
 		return
 	}
 	fmt.Println("Update result: ", updateResult.UpsertedID)
+
+	ChangeDomainStatus("http://127.0.0.1:3000/changedomainstatus", updSrv.InstanceID, true)
 
 	c.JSON(http.StatusOK, serializer.Response{
 		Code: 200,
