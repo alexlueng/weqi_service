@@ -11,7 +11,8 @@ import (
 	"weqi_service/util"
 )
 
-
+var RestrictIP map[string]map[string]interface{}
+var RestrictLogin map[string]map[string]interface{}
 // Init 初始化配置项
 func Init() {
 	// 从本地读取环境变量
@@ -29,15 +30,10 @@ func Init() {
 
 	fmt.Println("LOG_LEVEL :", os.Getenv("LOG_LEVEL"))
 
-	// 读取翻译文件
-	// if err := LoadLocales("conf/locales/zh-cn.yaml"); err != nil {
-	// 	util.Log().Panic("翻译文件加载失败", err)
-	// }
-
 	// 连接数据库
-	// models.Database(os.Getenv("MYSQL_DSN"))
 	models.Database(os.Getenv("URI"), os.Getenv("DBNAME"))
 	redis.RedisClient(os.Getenv("REDIS_ADDR"))
-	//	cache.Redis()
-}
 
+	RestrictIP = make(map[string]map[string]interface{})
+	RestrictLogin = make(map[string]map[string]interface{})
+}

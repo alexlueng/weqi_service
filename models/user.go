@@ -9,5 +9,7 @@ type User struct {
 	Telephone string `json:"telephone" bson:"telephone"`
 	CreateAt int64 `json:"create_at" bson:"create_at"`
 
+	OpenID string `json:"open_id" bson:"open_id"` // 微信用户的唯一标识
+
 	// Email Birthday region 等信息
 }

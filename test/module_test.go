@@ -5,6 +5,7 @@ import (
 	"testing"
 	"weqi_service/api"
 	"weqi_service/models"
+	"weqi_service/wxpay"
 )
 
 func TestModule(t *testing.T) {
@@ -24,4 +25,8 @@ func TestModule(t *testing.T) {
 func TestRand(t *testing.T) {
 	code := api.GenRandomDigitCode(6)
 	fmt.Println(code)
+}
+
+func TestSignKey(t *testing.T) {
+	wxpay.GetTestSignKey()
 }

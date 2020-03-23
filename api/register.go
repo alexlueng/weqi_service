@@ -80,7 +80,10 @@ type TelephoneService struct {
 	Code string `json:"code"`
 }
 
+// 发送验证码
 func SendCode(c *gin.Context) {
+
+	//session := sessions.Default(c)
 	// 获取手机号
 	var teleSrv TelephoneService
 	if err := c.ShouldBindJSON(&teleSrv); err != nil {
@@ -90,6 +93,33 @@ func SendCode(c *gin.Context) {
 		})
 		return
 	}
+	// 加上session机制 限制IP访问的次数 若超过访问次数则跳到指定页面进行人工验证
+	//ip := GetIpAddress(c)
+	//
+	//if _, ok := conf.RestrictIP[ip]; ok {
+	//	if conf.RestrictIP[ip]["times"].(int) > 10 {
+	//		c.JSON(http.StatusOK, serializer.Response{
+	//			Code: -1,
+	//			Msg:  "发送次数超出上限",
+	//		})
+	//		return
+	//	}
+	//	if conf.RestrictIP[ip]["expired"].(int64) > time.Now().Unix() { // 还没有超时
+	//		c.JSON(http.StatusOK, serializer.Response{
+	//			Code: -1,
+	//			Msg:  "发送验证码次数频繁",
+	//		})
+	//		return
+	//	} else { // 超时的话，访问次数加上1，重新设置超时时间
+	//		conf.RestrictIP[ip]["times"] = conf.RestrictIP[ip]["times"].(int) + 1
+	//		conf.RestrictIP[ip]["expired"] = conf.RestrictIP[ip]["expired"].(int64) + 5 * 60
+	//	}
+	//} else {
+	//	conf.RestrictIP[ip] = make(map[string]interface{})
+	//	conf.RestrictIP[ip]["expired"] = time.Now().Unix() + 5 * 60 // 五分钟内只能发一次
+	//	conf.RestrictIP[ip]["times"] = 1
+	//}
+
 	// 检查手机号是否已经注册过
 	var user models.User
 	collections := models.Client.Collection("users")
@@ -104,7 +134,7 @@ func SendCode(c *gin.Context) {
 	}
 	// 生成6位数验证码，保存到redis中
 	code := GenRandomDigitCode(6)
-	redis.Client.Set(teleSrv.Telephone, code, 1 * time.Minute) //1分钟过期
+	redis.Client.Set(teleSrv.Telephone, code, 2 * time.Minute) //2分钟过期
 
 	c.JSON(http.StatusOK, serializer.Response{
 		Code: 200,
