@@ -26,6 +26,25 @@ type LoginService struct {
 
 func Login(c *gin.Context) {
 
+	// swagger:route POST / users LoginPage
+	//
+	// Show login page.
+	//
+	// This will show all available users by default.
+	//
+	//     Consumes:
+	//     - application/json
+	//
+	//     Produces:
+	//     - application/json
+	//
+	//     Schemes: http, https, ws, wss
+	//
+	//     Responses:
+	//       default: Resp
+	//	     422: validationError
+
+
 	fmt.Println("Get request uri: ", c.Request.Host + c.Request.RequestURI)
 
 	validate := validator.New()

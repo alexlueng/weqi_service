@@ -291,6 +291,11 @@ func InstanceDetail(c *gin.Context) {
 		fmt.Println("Can't find module instance: ", err)
 		return
 	}
+
+	//qrcode_url := "https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=TOKEN"
+
+
+
 	c.JSON(http.StatusOK, serializer.Response{
 		Code: 200,
 		Msg:  "Get module instance",
